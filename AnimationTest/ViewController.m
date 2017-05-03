@@ -24,37 +24,33 @@ static CGFloat const kShapeSize = 100;
     [super viewDidLoad];
     self.shape = [self createLayerWithCenter:self.view.center];
     [self.view.layer addSublayer:self.shape];
-//    [self addAnimation];
     
-//    CAAnimationGroup *animGroup = [self createAnimationGroup:[self zRotationAnimation], [self xRotationAnimation], nil];
-    CAAnimationGroup *animGroup = [CAAnimationGroup animation];
-    animGroup.animations = [NSArray arrayWithObjects:
-                            [self zRotationAnimation],
-                            [self xRotationAnimation],
-                            [self yRotationAnimation],
-                            [self colorChangeOne],
-                            [self colorChangeTwo],
-                            nil];
-    animGroup.repeatCount = INFINITY;
-    animGroup.duration = 4.0;
+    CAAnimationGroup *animGroup = [self createAnimationGroup:[self colorChangeOne], nil];
+//    CAAnimationGroup *animGroup = [CAAnimationGroup animation];
+//    animGroup.animations = [NSArray arrayWithObjects:
+//                            [self zRotationAnimation],
+//                            [self xRotationAnimation],
+//                            [self yRotationAnimation],
+//                            [self colorChangeOne],
+//                           // [self colorChangeTwo],
+//                            nil];
+//    animGroup.repeatCount = INFINITY;
+//    animGroup.duration = 4.0;
     [self.shape addAnimation:animGroup forKey:@"MyAnimation"];
     
 }
 
 - (CABasicAnimation *)colorChangeOne {
     CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"backgroundColor"];
-    animation.fromValue = CFBridgingRelease([UIColor blackColor].CGColor);
-    animation.toValue = CFBridgingRelease([UIColor redColor].CGColor);
-    animation.duration = 0;
-    animation.beginTime = 1;
+    animation.toValue = (__bridge id _Nullable)([UIColor redColor].CGColor);
+//    animation.duration = 4;
+//    animation.beginTime = 1;
     return animation;
 }
 
 - (CABasicAnimation *)colorChangeTwo {
     CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"backgroundColor"];
-    animation.fromValue = (__bridge id _Nullable)([UIColor redColor].CGColor);
     animation.toValue = (__bridge id _Nullable)([UIColor blackColor].CGColor);
-    animation.duration = 0;
     animation.beginTime = 3;
     return animation;
 }
