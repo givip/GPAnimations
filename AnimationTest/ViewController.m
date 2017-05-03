@@ -10,7 +10,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import <CoreGraphics/CoreGraphics.h>
 
-static CGFloat const kShapeSize = 50;
+static CGFloat const kShapeSize = 100;
 
 @interface ViewController ()
 
@@ -28,19 +28,35 @@ static CGFloat const kShapeSize = 50;
     
 //    CAAnimationGroup *animGroup = [self createAnimationGroup:[self zRotationAnimation], [self xRotationAnimation], nil];
     CAAnimationGroup *animGroup = [CAAnimationGroup animation];
-    animGroup.animations = [NSArray arrayWithObjects:[self zRotationAnimation], [self xRotationAnimation], nil];
-    animGroup.repeatCount = 20;
-    animGroup.duration = 2.0;
+    animGroup.animations = [NSArray arrayWithObjects:
+                            [self zRotationAnimation],
+                            [self xRotationAnimation],
+                            [self yRotationAnimation],
+                            [self colorChangeOne],
+                            [self colorChangeTwo],
+                            nil];
+    animGroup.repeatCount = INFINITY;
+    animGroup.duration = 4.0;
     [self.shape addAnimation:animGroup forKey:@"MyAnimation"];
     
 }
 
-- (void)addAnimation {
-    CABasicAnimation *animation = [CABasicAnimation animation];
-    animation.keyPath = @"position.y";
-    animation.duration = 1;
-    
-    [self.view.layer addAnimation:animation forKey:@"basic"];
+- (CABasicAnimation *)colorChangeOne {
+    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"backgroundColor"];
+    animation.fromValue = CFBridgingRelease([UIColor blackColor].CGColor);
+    animation.toValue = CFBridgingRelease([UIColor redColor].CGColor);
+    animation.duration = 0;
+    animation.beginTime = 1;
+    return animation;
+}
+
+- (CABasicAnimation *)colorChangeTwo {
+    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"backgroundColor"];
+    animation.fromValue = (__bridge id _Nullable)([UIColor redColor].CGColor);
+    animation.toValue = (__bridge id _Nullable)([UIColor blackColor].CGColor);
+    animation.duration = 0;
+    animation.beginTime = 3;
+    return animation;
 }
 
 - (CABasicAnimation *)zRotationAnimation {
@@ -55,8 +71,15 @@ static CGFloat const kShapeSize = 50;
     CABasicAnimation *rotate = [CABasicAnimation animationWithKeyPath:@"transform.rotation.x"];
     rotate.toValue = @(M_PI); // The angle we are rotating to
     rotate.duration = 1.0;
-    rotate.repeatCount = INFINITY;
-//    rotate.beginTime = 5;
+    rotate.beginTime = 1;
+    return rotate;
+}
+
+- (CABasicAnimation *)yRotationAnimation {
+    CABasicAnimation *rotate = [CABasicAnimation animationWithKeyPath:@"transform.rotation.y"];
+    rotate.toValue = @(-M_PI); // The angle we are rotating to
+    rotate.duration = 1.0;
+    rotate.beginTime = 1;
     return rotate;
 }
 
@@ -81,7 +104,7 @@ static CGFloat const kShapeSize = 50;
     CGRect rect = CGRectMake(0, 0, kShapeSize, kShapeSize);
     square.bounds = rect;
     square.path = [UIBezierPath bezierPathWithRect:rect].CGPath;
-    square.fillColor = [UIColor redColor].CGColor;
+    square.backgroundColor = [UIColor blackColor].CGColor;
     square.position = center;
     return square;
 }
