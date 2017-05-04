@@ -25,32 +25,33 @@ static CGFloat const kShapeSize = 100;
     self.shape = [self createLayerWithCenter:self.view.center];
     [self.view.layer addSublayer:self.shape];
     
-    CAAnimationGroup *animGroup = [self createAnimationGroup:[self colorChangeOne], nil];
-//    CAAnimationGroup *animGroup = [CAAnimationGroup animation];
-//    animGroup.animations = [NSArray arrayWithObjects:
-//                            [self zRotationAnimation],
-//                            [self xRotationAnimation],
-//                            [self yRotationAnimation],
+//    CAAnimationGroup *animGroup = [self createAnimationGroup:[self colorChangeOne], nil];
+    CAAnimationGroup *animGroup = [CAAnimationGroup animation];
+    animGroup.animations = [NSArray arrayWithObjects:
+                            [self zRotationAnimation],
+                            [self xRotationAnimation],
+                            [self yRotationAnimation],
 //                            [self colorChangeOne],
-//                           // [self colorChangeTwo],
-//                            nil];
-//    animGroup.repeatCount = INFINITY;
-//    animGroup.duration = 4.0;
+                            [self colorChangeTwo],
+                            nil];
+    animGroup.repeatCount = INFINITY;
+    animGroup.duration = 4.0;
     [self.shape addAnimation:animGroup forKey:@"MyAnimation"];
     
 }
 
 - (CABasicAnimation *)colorChangeOne {
-    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"backgroundColor"];
+    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"fillColor"];
     animation.toValue = (__bridge id _Nullable)([UIColor redColor].CGColor);
-//    animation.duration = 4;
-//    animation.beginTime = 1;
+    animation.duration = 0;
+    animation.beginTime = 1;
     return animation;
 }
 
 - (CABasicAnimation *)colorChangeTwo {
-    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"backgroundColor"];
+    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"fillColor"];
     animation.toValue = (__bridge id _Nullable)([UIColor blackColor].CGColor);
+    animation.duration = 0;
     animation.beginTime = 3;
     return animation;
 }
@@ -100,7 +101,8 @@ static CGFloat const kShapeSize = 100;
     CGRect rect = CGRectMake(0, 0, kShapeSize, kShapeSize);
     square.bounds = rect;
     square.path = [UIBezierPath bezierPathWithRect:rect].CGPath;
-    square.backgroundColor = [UIColor blackColor].CGColor;
+    square.fillColor = [UIColor blueColor].CGColor;
+    square.backgroundColor = [UIColor clearColor].CGColor;
     square.position = center;
     return square;
 }
