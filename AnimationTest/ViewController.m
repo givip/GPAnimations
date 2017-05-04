@@ -32,12 +32,25 @@ static CGFloat const kShapeSize = 100;
                             [self xRotationAnimation],
                             [self yRotationAnimation],
 //                            [self colorChangeOne],
-                            [self colorChangeTwo],
+                            [self changeColorAnimation],
                             nil];
     animGroup.repeatCount = INFINITY;
-    animGroup.duration = 4.0;
+    animGroup.duration = 4.0f;
+//    animGroup.beginTime = 3.0f;
     [self.shape addAnimation:animGroup forKey:@"MyAnimation"];
     
+}
+
+- (CAKeyframeAnimation *)changeColorAnimation
+{
+    CAKeyframeAnimation *animation = [CAKeyframeAnimation animationWithKeyPath:@"fillColor"];
+    animation.values = [NSArray arrayWithObjects: (id)[UIColor redColor].CGColor, (id)[UIColor blackColor].CGColor, nil];
+    animation.keyTimes = [NSArray arrayWithObjects:[NSNumber numberWithFloat:1.5], [NSNumber numberWithFloat:2.0], nil];
+    animation.calculationMode = kCAAnimationPaced;
+    animation.removedOnCompletion = NO;
+    animation.fillMode = kCAFillModeForwards;
+    animation.duration = 0.0f;
+    return animation;
 }
 
 - (CABasicAnimation *)colorChangeOne {
