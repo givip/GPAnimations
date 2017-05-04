@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		57BD5FD41EBB3E7100F84B6E /* GOSSpinnerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 57BD5FD31EBB3E7100F84B6E /* GOSSpinnerView.m */; };
 		A724AD9A1EAE59FE00E07422 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A724AD991EAE59FE00E07422 /* main.m */; };
 		A724AD9D1EAE59FE00E07422 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A724AD9C1EAE59FE00E07422 /* AppDelegate.m */; };
 		A724ADA01EAE59FE00E07422 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A724AD9F1EAE59FE00E07422 /* ViewController.m */; };
@@ -16,6 +17,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		57BD5FD21EBB3E7100F84B6E /* GOSSpinnerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GOSSpinnerView.h; sourceTree = "<group>"; };
+		57BD5FD31EBB3E7100F84B6E /* GOSSpinnerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GOSSpinnerView.m; sourceTree = "<group>"; };
 		A724AD951EAE59FE00E07422 /* AnimationTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AnimationTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A724AD991EAE59FE00E07422 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		A724AD9B1EAE59FE00E07422 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -60,6 +63,8 @@
 			children = (
 				A724AD9B1EAE59FE00E07422 /* AppDelegate.h */,
 				A724AD9C1EAE59FE00E07422 /* AppDelegate.m */,
+				57BD5FD21EBB3E7100F84B6E /* GOSSpinnerView.h */,
+				57BD5FD31EBB3E7100F84B6E /* GOSSpinnerView.m */,
 				A724AD9E1EAE59FE00E07422 /* ViewController.h */,
 				A724AD9F1EAE59FE00E07422 /* ViewController.m */,
 				A724ADA11EAE59FE00E07422 /* Main.storyboard */,
@@ -153,6 +158,7 @@
 			files = (
 				A724ADA01EAE59FE00E07422 /* ViewController.m in Sources */,
 				A724AD9D1EAE59FE00E07422 /* AppDelegate.m in Sources */,
+				57BD5FD41EBB3E7100F84B6E /* GOSSpinnerView.m in Sources */,
 				A724AD9A1EAE59FE00E07422 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -312,6 +318,7 @@
 				A724ADAE1EAE59FE00E07422 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
