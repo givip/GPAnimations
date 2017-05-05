@@ -13,6 +13,8 @@
 
 @interface ViewController ()
 
+@property (nonatomic, strong) GOSSpinnerView *spinner;
+
 @end
 
 @implementation ViewController
@@ -20,12 +22,14 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    GOSSpinnerView *spinner = [[GOSSpinnerView alloc] initWithFrame:CGRectMake(0, 0, 80, 80)];
-    spinner.center = self.view.center;
-//    spinner.clipsToBounds = YES;
-    [self.view addSubview:spinner];
+    self.spinner = [[GOSSpinnerView alloc] initWithFrame:CGRectMake(0, 0, 80, 80)];
+    self.spinner.center = self.view.center;
+    [self.view addSubview:self.spinner];
     
-    [spinner startAnimation];
+    [self.spinner startAnimation];
+}
+- (IBAction)stopButton:(id)sender {
+    [self.spinner stopAnimation];
 }
 
 @end

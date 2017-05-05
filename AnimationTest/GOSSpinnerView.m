@@ -27,8 +27,10 @@ static CGFloat const kHexagoneRoundness = 0.14f;
     CAAnimationGroup *animGroup = [CAAnimationGroup animation];
     animGroup.animations = [NSArray arrayWithObjects:
                             [self zRotationAnimation],
+//                            [self zRotationAnimationWithAngle:M_PI startFrom:0.0f duration:1.0f],
                             [self rotationAnimationWithAngle:M_PI axis:@"x" startFrom:1.0f],
                             [self rotationAnimationWithAngle:-M_PI axis:@"y" startFrom:1.0f],
+//                            [self zRotationAnimationWithAngle:3*M_PI startFrom:2.0f duration:3.0f],
                             [self rotationAnimationWithAngle:M_PI axis:@"x" startFrom:4.0f],
                             [self rotationAnimationWithAngle:-M_PI axis:@"y" startFrom:4.0f],
                             [self animationChangeToColor:self.backSideColor startFrom:1.5f],
@@ -42,6 +44,10 @@ static CGFloat const kHexagoneRoundness = 0.14f;
 
 - (void)stopAnimation
 {
+    CAShapeLayer *currentStateLayer = self.hexagone.presentationLayer;
+    CAAnimationGroup *animationGroup = [currentStateLayer valueForKey:@"GOSLoaderAnimation"];
+//    animationGroup.repeatCount = 1;
+//    [animationGroup.animations add]
     [self.hexagone removeAllAnimations];
 }
 
@@ -90,6 +96,15 @@ static CGFloat const kHexagoneRoundness = 0.14f;
     animation.beginTime = start;
     return animation;
 }
+
+- (CABasicAnimation *)zRotationAnimationWithAngle:(CGFloat)angle startFrom:(CGFloat)start duration:(CGFloat)duration{
+    CABasicAnimation *rotate = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+    rotate.toValue = @(angle);
+    rotate.duration = duration;
+    rotate.beginTime = start;
+    return rotate;
+}
+
 
 - (CABasicAnimation *)zRotationAnimation {
     CABasicAnimation *rotate = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
