@@ -20,10 +20,12 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    UIView *spinner = [[GOSSpinnerView alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];
+    GOSSpinnerView *spinner = [[GOSSpinnerView alloc] initWithFrame:CGRectMake(0, 0, 80, 80)];
     spinner.center = self.view.center;
-    spinner.clipsToBounds = YES;
+//    spinner.clipsToBounds = YES;
     [self.view addSubview:spinner];
+    
+    [spinner startAnimation];
 }
 
 @end

@@ -14,9 +14,9 @@ static CGFloat const kHexagoneRoundness = 0.14f;
 
 @interface GOSSpinnerView ()
 
-@property (nonatomic, assign) CGSize shapeSize;
-@property (nonatomic, strong) CAShapeLayer *frontShape;
-//@property (nonatomic, assign) CGSize containerSize;
+@property (nonatomic, strong) CAShapeLayer *hexagone;
+@property (nonatomic, strong) UIColor *frontSideColor;
+@property (nonatomic, strong) UIColor *backSideColor;
 
 @end
 
@@ -24,12 +24,25 @@ static CGFloat const kHexagoneRoundness = 0.14f;
 
 - (void)startAnimation
 {
+    CAAnimationGroup *animGroup = [CAAnimationGroup animation];
+    animGroup.animations = [NSArray arrayWithObjects:
+                            [self zRotationAnimation],
+                            [self rotationAnimationWithAngle:M_PI axis:@"x" startFrom:1.0f],
+                            [self rotationAnimationWithAngle:-M_PI axis:@"y" startFrom:1.0f],
+                            [self rotationAnimationWithAngle:-M_PI axis:@"x" startFrom:4.0f],
+                            [self rotationAnimationWithAngle:M_PI axis:@"y" startFrom:4.0f],
+                            [self animationChangeToColor:self.backSideColor startFrom:1.5f],
+                            [self animationChangeToColor:self.frontSideColor startFrom:4.5f],
+                            nil];
+    animGroup.repeatCount = INFINITY;
+    animGroup.duration = 6.0f;
     
+    [self.hexagone addAnimation:animGroup forKey:@"GOSLoaderAnimation"];
 }
 
 - (void)stopAnimation
 {
-    
+    [self.hexagone removeAllAnimations];
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -44,40 +57,29 @@ static CGFloat const kHexagoneRoundness = 0.14f;
     {
         self = [super initWithFrame:frame];
         
-        CGFloat radius = self.frame.size.width/2;
+        CGFloat radius = frame.size.width/2;
         CGFloat cornerRadius = radius*0.98f;
         
-        UIColor *first = [UIColor colorWithRed:20.0/255.0 green:102.0/255.0 blue:172.0/255.0 alpha:1.0];
-        UIColor *second = [UIColor colorWithRed:239.0/255.0 green:64.0/255.0 blue:88.0/255.0 alpha:1.0];
+        _frontSideColor = [UIColor colorWithRed:20.0/255.0
+                                          green:102.0/255.0
+                                           blue:172.0/255.0
+                                          alpha:1.0];
+        _backSideColor = [UIColor colorWithRed:239.0/255.0
+                                         green:64.0/255.0
+                                          blue:88.0/255.0
+                                         alpha:1.0];
         
-        self.frontShape = [self createHexagoneLayerWithRadius:radius withRoundness:edgeRoundness];
-        self.frontShape.fillColor = first.CGColor;
-        self.frontShape.position = self.center;
+        _hexagone = [self createHexagoneLayerWithRadius:radius withRoundness:edgeRoundness];
+        _hexagone.fillColor = _frontSideColor.CGColor;
+        _hexagone.position = self.center;
         
         CAShapeLayer *circleMask = [self createCircleLayerWithRadius:cornerRadius];
+        _hexagone.mask = circleMask;
         
-        self.frontShape.mask = circleMask;
-        [self.layer addSublayer:self.frontShape];
-
-        
-        CAAnimationGroup *animGroup = [CAAnimationGroup animation];
-        animGroup.animations = [NSArray arrayWithObjects:
-                                [self zRotationAnimation],
-                                [self xRotationAnimationWithAngle:M_PI startFrom:1.0f],
-                                [self yRotationAnimationWithAngle:-M_PI startFrom:1.0f],
-                                [self xRotationAnimationWithAngle:-M_PI startFrom:4.0f],
-                                [self yRotationAnimationWithAngle:M_PI startFrom:4.0f],
-                                [self animationChangeToColor:second startFrom:1.5f],
-                                [self animationChangeToColor:first startFrom:4.5f],
-                                nil];
-        animGroup.repeatCount = INFINITY;
-        animGroup.duration = 6.0f;
-       
-        [self.frontShape addAnimation:animGroup forKey:@"GroupAnimation"];
+        [self.layer addSublayer:_hexagone];
     }
     return self;
 }
-
 
 - (CABasicAnimation *)animationChangeToColor:(UIColor *)color startFrom:(CGFloat)start {
     CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"fillColor"];
@@ -93,25 +95,18 @@ static CGFloat const kHexagoneRoundness = 0.14f;
     CABasicAnimation *rotate = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
     rotate.toValue = @(2 * M_PI);
     rotate.duration = 2.0;
-    rotate.additive = YES;
     rotate.repeatCount = INFINITY;
     return rotate;
 }
 
-- (CABasicAnimation *)xRotationAnimationWithAngle:(CGFloat)angle startFrom:(CGFloat)start {
-    CABasicAnimation *rotate = [CABasicAnimation animationWithKeyPath:@"transform.rotation.x"];
+- (CABasicAnimation *)rotationAnimationWithAngle:(CGFloat)angle axis:(NSString *)axis startFrom:(CGFloat)start {
+    NSAssert([axis isEqualToString:@"y"] || [axis isEqualToString:@"x"], @"Значение оси неверно");
+    NSString *animationKeyPath = [NSString stringWithFormat:@"%@%@", @"transform.rotation.", axis];
+    CABasicAnimation *rotate = [CABasicAnimation animationWithKeyPath:animationKeyPath];
     rotate.toValue = @(angle);
     rotate.duration = 1.0;
     rotate.beginTime = start;
     
-    return rotate;
-}
-
-- (CABasicAnimation *)yRotationAnimationWithAngle:(CGFloat)angle startFrom:(CGFloat)start {
-    CABasicAnimation *rotate = [CABasicAnimation animationWithKeyPath:@"transform.rotation.y"];
-    rotate.toValue = @(angle);
-    rotate.duration = 1.0;
-    rotate.beginTime = start;
     return rotate;
 }
 
@@ -133,8 +128,12 @@ static CGFloat const kHexagoneRoundness = 0.14f;
 #pragma mark- Circle mask drawing
 - (CAShapeLayer *)createCircleLayerWithRadius:(CGFloat)radius
 {
-    CGPoint center = self.frontShape.position;
-    UIBezierPath *path = [UIBezierPath bezierPathWithArcCenter:center radius:radius startAngle:0 endAngle:2*M_PI clockwise:0];
+    CGPoint center = self.hexagone.position;
+    UIBezierPath *path = [UIBezierPath bezierPathWithArcCenter:center
+                                                        radius:radius
+                                                    startAngle:0
+                                                      endAngle:2*M_PI
+                                                     clockwise:0];
     CAShapeLayer *circle = [CAShapeLayer layer];
     circle.path = path.CGPath;
     circle.fillRule = kCAFillRuleEvenOdd;
@@ -148,7 +147,7 @@ static CGFloat const kHexagoneRoundness = 0.14f;
     CGPoint center = self.layer.position;
     NSArray<NSValue *> *hexagoneVertexes = [self hexagoneVertexesWithCenter:center
                                                                      radius:radius
-                                                              containerSize:CGSizeMake(radius*2, radius*2)];
+                                                              containerSize:CGSizeMake(2*radius, 2*radius)];
     UIBezierPath *path = [self hexagoneWithPoints:hexagoneVertexes roundness:roundness];
     CAShapeLayer *square = [CAShapeLayer layer];
     square.path = path.CGPath;
@@ -263,6 +262,5 @@ static CGFloat const kHexagoneRoundness = 0.14f;
     }
     return CGPointMake(controlPointXAbsOffset, controlPointYAbsOffset);
 }
-
 
 @end
