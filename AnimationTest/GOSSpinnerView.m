@@ -7,8 +7,6 @@
 //
 
 #import "GOSSpinnerView.h"
-#import <QuartzCore/QuartzCore.h>
-#import <CoreGraphics/CoreGraphics.h>
 
 static CGFloat const kHexagoneRoundness = 0.14f;
 
