@@ -20,11 +20,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    UIView *spinner = [[GOSSpinnerView alloc] initWithFrame:CGRectMake(0, 0, 200, 200)];
+    UIView *spinner = [[GOSSpinnerView alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];
     spinner.center = self.view.center;
     spinner.clipsToBounds = YES;
-//    spinner.layer.borderColor = [UIColor grayColor].CGColor;
-//    spinner.layer.borderWidth = 1.0f;
     [self.view addSubview:spinner];
 }
 

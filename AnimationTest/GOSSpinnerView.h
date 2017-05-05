@@ -13,4 +13,6 @@
 - (void)startAnimation;
 - (void)stopAnimation;
 
+- (instancetype)initWithFrame:(CGRect)frame edgeRoundness:(CGFloat)edgeRoundness;
+
 @end
