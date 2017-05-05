@@ -44,8 +44,8 @@ static CGFloat const kHexagoneRoundness = 0.14f;
 
 - (void)stopAnimation
 {
-    CAShapeLayer *currentStateLayer = self.hexagone.presentationLayer;
-    CAAnimationGroup *animationGroup = [currentStateLayer valueForKey:@"GOSLoaderAnimation"];
+//    CAShapeLayer *currentStateLayer = self.hexagone.presentationLayer;
+//    CAAnimationGroup *animationGroup = [currentStateLayer valueForKey:@"GOSLoaderAnimation"];
 //    animationGroup.repeatCount = 1;
 //    [animationGroup.animations add]
     [self.hexagone removeAllAnimations];
