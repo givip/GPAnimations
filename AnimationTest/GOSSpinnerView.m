@@ -43,12 +43,14 @@ static CGFloat const kHexagoneRoundness = 0.14f;
     if (self)
     {
         self = [super initWithFrame:frame];
-        CGFloat cornerRadius = frame.size.width * 0.90f;
-        CGSize shapeSize = self.frame.size;
+        
+        CGFloat radius = self.frame.size.width/2;
+        CGFloat cornerRadius = radius*0.98f;
+        
         UIColor *first = [UIColor colorWithRed:20.0/255.0 green:102.0/255.0 blue:172.0/255.0 alpha:1.0];
         UIColor *second = [UIColor colorWithRed:239.0/255.0 green:64.0/255.0 blue:88.0/255.0 alpha:1.0];
         
-        self.frontShape = [self createHexagoneLayerWithRadius:shapeSize.height/2 withRoundness:edgeRoundness];
+        self.frontShape = [self createHexagoneLayerWithRadius:radius withRoundness:edgeRoundness];
         self.frontShape.fillColor = first.CGColor;
         self.frontShape.position = self.center;
         
@@ -131,13 +133,11 @@ static CGFloat const kHexagoneRoundness = 0.14f;
 #pragma mark- Circle mask drawing
 - (CAShapeLayer *)createCircleLayerWithRadius:(CGFloat)radius
 {
-    CGPoint center = self.layer.position;
+    CGPoint center = self.frontShape.position;
     UIBezierPath *path = [UIBezierPath bezierPathWithArcCenter:center radius:radius startAngle:0 endAngle:2*M_PI clockwise:0];
     CAShapeLayer *circle = [CAShapeLayer layer];
     circle.path = path.CGPath;
-    circle.masksToBounds = YES;
     circle.fillRule = kCAFillRuleEvenOdd;
-    circle.frame = CGRectMake(0, 0, radius*2, radius*2);
     circle.backgroundColor = [UIColor clearColor].CGColor;
     return circle;
 }
