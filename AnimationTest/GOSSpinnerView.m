@@ -29,8 +29,8 @@ static CGFloat const kHexagoneRoundness = 0.14f;
                             [self zRotationAnimation],
                             [self rotationAnimationWithAngle:M_PI axis:@"x" startFrom:1.0f],
                             [self rotationAnimationWithAngle:-M_PI axis:@"y" startFrom:1.0f],
-                            [self rotationAnimationWithAngle:-M_PI axis:@"x" startFrom:4.0f],
-                            [self rotationAnimationWithAngle:M_PI axis:@"y" startFrom:4.0f],
+                            [self rotationAnimationWithAngle:M_PI axis:@"x" startFrom:4.0f],
+                            [self rotationAnimationWithAngle:-M_PI axis:@"y" startFrom:4.0f],
                             [self animationChangeToColor:self.backSideColor startFrom:1.5f],
                             [self animationChangeToColor:self.frontSideColor startFrom:4.5f],
                             nil];
@@ -100,13 +100,12 @@ static CGFloat const kHexagoneRoundness = 0.14f;
 }
 
 - (CABasicAnimation *)rotationAnimationWithAngle:(CGFloat)angle axis:(NSString *)axis startFrom:(CGFloat)start {
-    NSAssert([axis isEqualToString:@"y"] || [axis isEqualToString:@"x"], @"Значение оси неверно");
+    NSAssert([axis isEqualToString:@"y"] || [axis isEqualToString:@"x"], @"Значение оси не допустимое значение");
     NSString *animationKeyPath = [NSString stringWithFormat:@"%@%@", @"transform.rotation.", axis];
     CABasicAnimation *rotate = [CABasicAnimation animationWithKeyPath:animationKeyPath];
     rotate.toValue = @(angle);
     rotate.duration = 1.0;
     rotate.beginTime = start;
-    
     return rotate;
 }
 
@@ -221,7 +220,7 @@ static CGFloat const kHexagoneRoundness = 0.14f;
              ];
 }
 
-#pragma mark- Bezier Path control point calculation for hexagone
+#pragma mark- Control points for hexagone Bezier Path
 - (CGPoint)controlPointBetweenPoint:(CGPoint)p1 andPoint:(CGPoint)p2 roundness:(CGFloat)roundness
 {
     NSAssert (fabs(roundness) <= 1, @"Параметр скругления должен быть на отрезке [0;1]");
