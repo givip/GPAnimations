@@ -22,7 +22,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.spinner = [[GOSSpinnerView alloc] initWithFrame:CGRectMake(0, 0, 80, 80)];
+    self.spinner = [[GOSSpinnerView alloc] initWithFrame:CGRectMake(0, 0, 35, 35)];
     self.spinner.center = self.view.center;
     [self.view addSubview:self.spinner];
     

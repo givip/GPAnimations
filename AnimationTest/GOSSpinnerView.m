@@ -8,13 +8,21 @@
 
 #import "GOSSpinnerView.h"
 
-static CGFloat const kHexagoneRoundness = 0.14f;
+static CGFloat const GOSHexagoneRoundness = 0.14f; /**< Стандартное значение параметра edgeRoundness при инициализации*/
+static CGFloat const GOSAnimationTime = 6.0f; /**< Момент изменения цвета при втором вращении*/
+
+static CGFloat const GOSRotationStartTimeFront = 1.0f; /**< Начало прямой анимации вращения по осям X и Y*/
+static CGFloat const GOSRotationStartTimeBack = 4.0f; /**< Начало обратной анимации вращения по осям X и Y*/
+static CGFloat const GOSColorChangeStartTimeFront = 1.5f; /**< Момент изменения цвета при первом вращении*/
+static CGFloat const GOSColorChangeStartTimeBack = 4.5f; /**< Момент изменения цвета при втором вращении*/
+
+static CGFloat const GOSMaskCircleRadiusRelatively = 0.98f; /**< Радиус окружности-маски для скругления углов шестиугольника*/
 
 @interface GOSSpinnerView ()
 
-@property (nonatomic, strong) CAShapeLayer *hexagone;
-@property (nonatomic, strong) UIColor *frontSideColor;
-@property (nonatomic, strong) UIColor *backSideColor;
+@property (nonatomic, strong) CAShapeLayer *hexagone; /**< Слой шестиугольника*/
+@property (nonatomic, strong) UIColor *frontSideColor; /**< Первый цвет лоадера*/
+@property (nonatomic, strong) UIColor *backSideColor; /**< Второй цвет лоадера*/
 
 @end
 
@@ -22,36 +30,30 @@ static CGFloat const kHexagoneRoundness = 0.14f;
 
 - (void)startAnimation
 {
-    CAAnimationGroup *animGroup = [CAAnimationGroup animation];
-    animGroup.animations = [NSArray arrayWithObjects:
-                            [self zRotationAnimation],
-//                            [self zRotationAnimationWithAngle:M_PI startFrom:0.0f duration:1.0f],
-                            [self rotationAnimationWithAngle:M_PI axis:@"x" startFrom:1.0f],
-                            [self rotationAnimationWithAngle:-M_PI axis:@"y" startFrom:1.0f],
-//                            [self zRotationAnimationWithAngle:3*M_PI startFrom:2.0f duration:3.0f],
-                            [self rotationAnimationWithAngle:M_PI axis:@"x" startFrom:4.0f],
-                            [self rotationAnimationWithAngle:-M_PI axis:@"y" startFrom:4.0f],
-                            [self animationChangeToColor:self.backSideColor startFrom:1.5f],
-                            [self animationChangeToColor:self.frontSideColor startFrom:4.5f],
-                            nil];
+    [self stopAnimation];
+    CAAnimationGroup *animGroup = [self createAnimationGroupWithAnimations:
+                                   [self zRotationAnimation],
+                                   [self rotationAnimationWithAngle:M_PI axis:@"x" startFrom:GOSRotationStartTimeFront],
+                                   [self rotationAnimationWithAngle:-M_PI axis:@"y" startFrom:GOSRotationStartTimeFront],
+                                   [self rotationAnimationWithAngle:M_PI axis:@"x" startFrom:GOSRotationStartTimeBack],
+                                   [self rotationAnimationWithAngle:-M_PI axis:@"y" startFrom:GOSRotationStartTimeBack],
+                                   [self animationChangeToColor:self.backSideColor startFrom:GOSColorChangeStartTimeFront],
+                                   [self animationChangeToColor:self.frontSideColor startFrom:GOSColorChangeStartTimeBack],
+                                   nil];
     animGroup.repeatCount = INFINITY;
-    animGroup.duration = 6.0f;
+    animGroup.duration = GOSAnimationTime;
     
     [self.hexagone addAnimation:animGroup forKey:@"GOSLoaderAnimation"];
 }
 
 - (void)stopAnimation
 {
-//    CAShapeLayer *currentStateLayer = self.hexagone.presentationLayer;
-//    CAAnimationGroup *animationGroup = [currentStateLayer valueForKey:@"GOSLoaderAnimation"];
-//    animationGroup.repeatCount = 1;
-//    [animationGroup.animations add]
     [self.hexagone removeAllAnimations];
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
-    return [self initWithFrame:frame edgeRoundness:kHexagoneRoundness];
+    return [self initWithFrame:frame edgeRoundness:GOSHexagoneRoundness];
 }
 
 
@@ -61,8 +63,8 @@ static CGFloat const kHexagoneRoundness = 0.14f;
     {
         self = [super initWithFrame:frame];
         
-        CGFloat radius = frame.size.width/2;
-        CGFloat cornerRadius = radius*0.98f;
+        CGFloat radius = frame.size.width / 2.0;
+        CGFloat cornerRadius = radius * GOSMaskCircleRadiusRelatively;
         
         _frontSideColor = [UIColor colorWithRed:20.0/255.0
                                           green:102.0/255.0
@@ -85,6 +87,7 @@ static CGFloat const kHexagoneRoundness = 0.14f;
     return self;
 }
 
+#pragma mark- Loader animation methods
 - (CABasicAnimation *)animationChangeToColor:(UIColor *)color startFrom:(CGFloat)start {
     CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"fillColor"];
     animation.toValue = (__bridge id _Nullable)(color.CGColor);
@@ -95,15 +98,6 @@ static CGFloat const kHexagoneRoundness = 0.14f;
     return animation;
 }
 
-- (CABasicAnimation *)zRotationAnimationWithAngle:(CGFloat)angle startFrom:(CGFloat)start duration:(CGFloat)duration{
-    CABasicAnimation *rotate = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
-    rotate.toValue = @(angle);
-    rotate.duration = duration;
-    rotate.beginTime = start;
-    return rotate;
-}
-
-
 - (CABasicAnimation *)zRotationAnimation {
     CABasicAnimation *rotate = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
     rotate.toValue = @(2 * M_PI);
@@ -113,7 +107,11 @@ static CGFloat const kHexagoneRoundness = 0.14f;
 }
 
 - (CABasicAnimation *)rotationAnimationWithAngle:(CGFloat)angle axis:(NSString *)axis startFrom:(CGFloat)start {
-    NSAssert([axis isEqualToString:@"y"] || [axis isEqualToString:@"x"], @"Значение оси не допустимое значение");
+    /// Проверка значения оси на допустимое значение
+    if (![axis isEqualToString:@"y"] && ![axis isEqualToString:@"x"])
+    {
+        return nil;
+    }
     NSString *animationKeyPath = [NSString stringWithFormat:@"%@%@", @"transform.rotation.", axis];
     CABasicAnimation *rotate = [CABasicAnimation animationWithKeyPath:animationKeyPath];
     rotate.toValue = @(angle);
@@ -122,7 +120,7 @@ static CGFloat const kHexagoneRoundness = 0.14f;
     return rotate;
 }
 
-- (CAAnimationGroup *)createAnimationGroup:(CAAnimation *)animation, ... NS_REQUIRES_NIL_TERMINATION {
+- (CAAnimationGroup *)createAnimationGroupWithAnimations:(CAAnimation *)animation, ... NS_REQUIRES_NIL_TERMINATION {
     CAAnimationGroup *group = [CAAnimationGroup animation];
     NSMutableArray *animations = [NSMutableArray new];
     va_list args;
@@ -143,7 +141,7 @@ static CGFloat const kHexagoneRoundness = 0.14f;
     CGPoint center = self.hexagone.position;
     UIBezierPath *path = [UIBezierPath bezierPathWithArcCenter:center
                                                         radius:radius
-                                                    startAngle:0
+                                                    startAngle:0.0
                                                       endAngle:2*M_PI
                                                      clockwise:0];
     CAShapeLayer *circle = [CAShapeLayer layer];
@@ -159,13 +157,13 @@ static CGFloat const kHexagoneRoundness = 0.14f;
     CGPoint center = self.layer.position;
     NSArray<NSValue *> *hexagoneVertexes = [self hexagoneVertexesWithCenter:center
                                                                      radius:radius
-                                                              containerSize:CGSizeMake(2*radius, 2*radius)];
+                                                              containerSize:CGSizeMake(2.0 * radius, 2.0 * radius)];
     UIBezierPath *path = [self hexagoneWithPoints:hexagoneVertexes roundness:roundness];
     CAShapeLayer *square = [CAShapeLayer layer];
     square.path = path.CGPath;
     square.masksToBounds = YES;
     square.miterLimit = 0;
-    square.frame = CGRectMake(0, 0, radius*2, radius*2);
+    square.frame = CGRectMake(0, 0, radius * 2.0, radius * 2.0);
     square.backgroundColor = [UIColor clearColor].CGColor;
     return square;
 }
@@ -173,7 +171,7 @@ static CGFloat const kHexagoneRoundness = 0.14f;
 #pragma mark- Hexagone path drawing
 - (UIBezierPath *)hexagoneWithPoints:(NSArray<NSValue *> *)points roundness:(CGFloat)roundness
 {
-
+    
     UIBezierPath *path = [UIBezierPath bezierPath];
     path.lineCapStyle = kCGLineCapRound;
     path.lineJoinStyle = kCGLineJoinRound;
@@ -184,7 +182,7 @@ static CGFloat const kHexagoneRoundness = 0.14f;
     CGPoint begin = points[0].CGPointValue;
     [path moveToPoint:begin];
     CGPoint prevPoint = begin;
-
+    
     for (NSUInteger step = 0; step < points.count; step++)
     {
         CGPoint vertex;
@@ -198,7 +196,6 @@ static CGFloat const kHexagoneRoundness = 0.14f;
         }
         
         CGPoint controlPoint = [self controlPointBetweenPoint:prevPoint andPoint:vertex roundness:roundness];
-        NSLog(@"Vertex #%lu: x= %f , y= %f -- ControlPoint: x= %f , y= %f", step, vertex.x, vertex.y, controlPoint.x, controlPoint.y);
         [path addQuadCurveToPoint:vertex controlPoint:controlPoint];
         prevPoint = vertex;
     }
@@ -208,15 +205,19 @@ static CGFloat const kHexagoneRoundness = 0.14f;
 #pragma mark- Hexagone vertexes calculation
 - (NSArray<NSValue *> *)hexagoneVertexesWithCenter:(CGPoint)center radius:(CGFloat)radius containerSize:(CGSize)size
 {
-    NSAssert(size.height == size.width, @"Контейнер не квадратный");
+    /// Контейнер должен быть квадратный
+    if (size.height != size.width)
+    {
+        return nil;
+    }
     CGFloat containerSide = size.width;
     
-    CGFloat inset = (containerSide - (2 * radius)) / 2;
+    CGFloat inset = (containerSide - (2.0 * radius)) / 2.0;
     
-    CGFloat xOffset = radius * cos(M_PI/6);
-    CGFloat yOffset = radius * sin(M_PI/6);
+    CGFloat xOffset = radius * cos(M_PI / 6.0);
+    CGFloat yOffset = radius * sin(M_PI / 6.0);
     
-    CGPoint h0 = CGPointMake(inset + radius, inset + (2 * radius));
+    CGPoint h0 = CGPointMake(inset + radius, inset + (2.0 * radius));
     CGPoint h1 = CGPointMake(inset + radius + xOffset, inset + radius + yOffset);
     CGPoint h2 = CGPointMake(inset + radius + xOffset, inset + radius - yOffset);
     CGPoint h3 = CGPointMake(inset + radius, inset);
@@ -236,14 +237,21 @@ static CGFloat const kHexagoneRoundness = 0.14f;
 #pragma mark- Control points for hexagone Bezier Path
 - (CGPoint)controlPointBetweenPoint:(CGPoint)p1 andPoint:(CGPoint)p2 roundness:(CGFloat)roundness
 {
-    NSAssert (fabs(roundness) <= 1, @"Параметр скругления должен быть на отрезке [0;1]");
+    /// Параметр скругления должен быть на отрезке [0;1]
+    /// Если это условие не выполняется, то рисуются прямые линии
+    CGPoint center = CGPointMake((p2.x + p1.x) / 2, (p2.y + p1.y) / 2);
+    if (!(fabs(roundness) <= 1))
+    {
+        return center;
+    }
+    
     CGFloat distance = sqrt(pow((p2.x - p1.x), 2) + pow((p2.y - p1.y), 2));
     CGFloat length = roundness * distance;
     CGFloat h = fabs(p2.y - p1.y);
     CGFloat w = fabs(p2.x - p1.x);
     CGFloat controlPointXOffset = length * cos(M_PI_2 - atan(h/w));
     CGFloat controlPointYOffset = length * sin(M_PI_2 - atan(h/w));
-    CGPoint center = CGPointMake((p2.x + p1.x)/2, (p2.y + p1.y)/2);
+    
     CGFloat controlPointXAbsOffset;
     CGFloat controlPointYAbsOffset;
     if (p1.x <= p2.x)
